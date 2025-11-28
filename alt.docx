@@ -1,0 +1,79 @@
+# ============================
+# Base Class: Vehicle
+# ============================
+class Vehicle:
+    def __init__(self, make, model, year, mileage=0):
+        self.make = make
+        self.model = model
+        self.year = year
+        self._mileage = mileage   # protected attribute
+
+    def drive(self, distance):
+        """Increase mileage by distance driven."""
+        if distance > 0:
+            self._mileage += distance
+
+    def get_info(self):
+        """Return basic vehicle information."""
+        return f"{self.year} {self.make} {self.model}, Mileage: {self._mileage} km"
+
+    def __str__(self):
+        return self.get_info()
+
+    @classmethod
+    def from_string(cls, data_string):
+        """Create a Vehicle instance from 'Make-Model-Year' format."""
+        make, model, year = data_string.split("-")
+        return cls(make, model, int(year))
+
+
+# ============================
+# Subclass: Car
+# ============================
+class Car(Vehicle):
+    vehicle_type = "Car"
+
+    def __init__(self, make, model, year, fuel_capacity, mileage=0):
+        super().__init__(make, model, year, mileage)
+        self.fuel_capacity = fuel_capacity
+
+    def get_info(self):
+        """Return car info including fuel capacity."""
+        base_info = super().get_info()
+        return f"{base_info}, Fuel Capacity: {self.fuel_capacity} L"
+
+
+# ============================
+# Subclass: ElectricScooter
+# ============================
+class ElectricScooter(Vehicle):
+    def __init__(self, make, model, year, battery_percentage=100, mileage=0):
+        super().__init__(make, model, year, mileage)
+        self.battery_percentage = battery_percentage
+
+    def drive(self, distance):
+        """
+        Override drive:
+        - Increase mileage
+        - Reduce battery percentage (simple model: 1% battery per 2 km)
+        """
+        super().drive(distance)
+        battery_drop = distance / 2
+        self.battery_percentage = max(0, self.battery_percentage - battery_drop)
+
+    def get_info(self):
+        base = super().get_info()
+        return f"{base}, Battery: {self.battery_percentage:.1f}%"
+
+    @staticmethod
+    def is_charging_required(battery_percentage):
+        """Return True if battery is below 20%."""
+        return battery_percentage < 20
+
+
+# ============================
+# Polymorphism
+# ============================
+def print_vehicle_report(vehicles):
+    for v in vehicles:
+        print(v.get_info())
